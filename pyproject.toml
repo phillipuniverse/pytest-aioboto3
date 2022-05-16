@@ -28,3 +28,6 @@ filterwarnings = [
     'error', # treat all warnings as errors
 ]
 asyncio_mode = "auto"
+
+[tool.poetry.plugins."pytest11"]
+pytest-aioboto3 = 'pytest_aioboto3'

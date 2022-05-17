@@ -1,3 +1,4 @@
+from __future__ import annotations  # to allow subscriptable Popen in python >=3.8
 import dataclasses
 import logging
 import shutil

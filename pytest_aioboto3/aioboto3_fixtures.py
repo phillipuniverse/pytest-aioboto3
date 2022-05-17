@@ -1,20 +1,18 @@
 """
 AWS asyncio test fixtures
 """
-from typing import Any, AsyncIterator, Dict, Iterator, List, Type, TypeVar
+from typing import Any, AsyncIterator, Iterator, Mapping, Type, TypeVar
 from unittest import mock
 
 import aioboto3
 import boto3
 import pytest
-from types_aiobotocore_s3 import S3Client
-
-from .moto_fixtures import MockedAWSService
+from types_aiobotocore_s3 import S3Client, S3ServiceResource
 
 T = TypeVar("T")
 
 
-def create_fake_session(base_class: Type[T], url_overrides: Dict[str, str]) -> Type[T]:
+def create_fake_session(base_class: Type[T], url_overrides: Mapping[str, str]) -> Type[T]:
     class FakeSession(base_class):  # type:ignore[valid-type, misc]
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             super(FakeSession, self).__init__(*args, **kwargs)
@@ -47,13 +45,9 @@ def create_fake_session(base_class: Type[T], url_overrides: Dict[str, str]) -> T
 
 
 @pytest.fixture
-def moto_patch_session(moto_services: List[MockedAWSService]) -> Iterator[None]:
-    services_map = {service.service_name: service.moto_url for service in moto_services}
-    MotoAioboto3Session = create_fake_session(aioboto3.Session, services_map)
-    MotoBoto3Session = create_fake_session(
-        boto3.Session,
-        services_map,
-    )
+def moto_patch_session(moto_services: Mapping[str, str]) -> Iterator[None]:
+    MotoAioboto3Session = create_fake_session(aioboto3.Session, moto_services)
+    MotoBoto3Session = create_fake_session(boto3.Session, moto_services)
 
     sessions = [
         mock.patch("aioboto3.Session", MotoAioboto3Session),
@@ -72,6 +66,15 @@ def moto_patch_session(moto_services: List[MockedAWSService]) -> Iterator[None]:
 
 @pytest.fixture
 async def aioboto3_s3_client(moto_patch_session: None) -> AsyncIterator[S3Client]:
-    session = aioboto3.Session(region_name="us-east-1")
-    async with session.client("s3", region_name="us-east-1") as client:  # type: S3Client
+    region = "us-east-1"
+    session = aioboto3.Session(region_name=region)
+    async with session.client("s3", region_name=region) as client:  # type: S3Client
         yield client
+
+
+@pytest.fixture
+async def aioboto3_s3_resource(moto_patch_session: None) -> AsyncIterator[S3ServiceResource]:
+    region = "us-east-1"
+    session = aioboto3.Session(region_name=region)
+    async with session.resource("s3", region_name=region) as resource:  # type: S3ServiceResource
+        yield resource

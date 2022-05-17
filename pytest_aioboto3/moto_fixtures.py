@@ -1,5 +1,3 @@
-from __future__ import annotations  # to allow subscriptable Popen in python >=3.8
-import dataclasses
 import logging
 import shutil
 import signal
@@ -7,7 +5,7 @@ import socket
 import subprocess
 import time
 from subprocess import Popen
-from typing import Any, Iterator, List
+from typing import Any, Dict, Iterator, Mapping
 
 import pytest
 import requests
@@ -42,10 +40,10 @@ def start_moto_server(service_name: str, host: str, port: int) -> Popen[Any]:
     for i in range(0, 30):
         output = process.poll()
         if output is not None:
-            print(f"moto_server exited status {output}")
+            logger.error(f"moto_server exited status {output}")
             stdout, stderr = process.communicate()
-            print(f"moto_server stdout: {str(stdout)}")
-            print(f"moto_server stderr: {str(stderr)}")
+            logger.error(f"moto_server stdout: {str(stdout)}")
+            logger.error(f"moto_server stderr: {str(stderr)}")
             pytest.fail(f"Can not start service: {service_name}")
 
         try:
@@ -85,24 +83,15 @@ def get_free_tcp_port() -> int:
     return int(port)
 
 
-@dataclasses.dataclass(frozen=True)
-class MockedAWSService:
-    service_name: str
-    """AWS service name that you would use when creating a client/resource like 's3' or 'kms' or 'dynamodb'"""
-    moto_url: str
-    """Url that moto is listening on"""
-
-
 @pytest.fixture(scope="session")
-def moto_services() -> Iterator[List[MockedAWSService]]:
-    processes = []
-    services = []
-
+def moto_services() -> Iterator[Mapping[str, str]]:
     """
-    To mock a new AWS service:
-    types-aiobotocore = {extras = ["s3"], version = "^2.2.0"}
-moto = {extras = ["s3"], version = "^3.1.6"}
-boto3-stubs 
+    Map of mocked services with moto where the key is the service name and the value is the moto url to that service
+    """
+    processes = []
+    services: Dict[str, str] = {}
+    """
+
     1. Add a new entry to the 'extras' section in pyproject.toml for types-aiobotocore, moto and boto3-stubs like 'dynamodb' or 'ec2'
     2. Add to this tuple the service that you want to mock, the same as the extra you added
     """
@@ -111,13 +100,14 @@ boto3-stubs
         port = get_free_tcp_port()
         url = f"http://{host}:{port}"
         processes.append(start_moto_server(service, host, port))
-        services.append(MockedAWSService(service, url))
+        services[service] = url
 
     yield services
 
     for process in processes:
         try:
             stop_process(process)
-        finally:
+            logger.info(f"Stopped moto process {process.pid}")
+        except Exception as e:
             # Keep going through exceptions to stop as many as possible
-            logger.error(f"Problem stopping moto process {process}")
+            logger.exception(f"Problem stopping moto process {process}", e)

@@ -37,7 +37,7 @@ tests/test_s3.py .                                                              
 
 This project is not yet hosted on PyPI. To install it, you can use the git url for this repo:
 
-`pip install git+https://github.com/phillipuniverse/aioboto3-testing`
+`pip install git+https://github.com/phillipuniverse/pytest-aioboto3`
 
 ## Usage
 

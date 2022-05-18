@@ -11,13 +11,13 @@ authors = ["Shipwell Engineering", "Phillip Verheyden"]
 [tool.poetry.dependencies]
 python = "^3.7"
 aioboto3 = "^9.5.0"
-moto = {extras = ["s3", "server"], version = "^3.1.6"}
+moto = {extras = ["s3", "server"], version = "^3.1.9"}
 types-aiobotocore = {extras = ["s3"], version = "^2.2.0"}
 requests = "^2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
-boto3-stubs = {extras = ["s3"], version = "^1.22.2"}
+boto3-stubs = {extras = ["s3"], version = "^1.23.2"}
 pytest-asyncio = "^0.18.3"
 
 [tool.pytest.ini_options]

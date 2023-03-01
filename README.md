@@ -10,7 +10,7 @@ Most of the code for this came from the aioboto3 tests themselves at https://git
 
 ## Running the example test
 
-- Poetry 1.1+
+- Poetry 1.4+
 - Python 3.9+ (although probably Python 3.7+ will work)
 
 ```

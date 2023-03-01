@@ -9,7 +9,7 @@ description = "Aioboto3 Pytest with Moto"
 authors = ["Shipwell Engineering", "Phillip Verheyden"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 aioboto3 = "^9.5.0"
 moto = {extras = ["s3", "server"], version = "^3.1.9"}
 types-aiobotocore = {extras = ["s3"], version = "^2.2.0"}

@@ -10,8 +10,8 @@ Most of the code for this came from the aioboto3 tests themselves at https://git
 
 ## Running the example test
 
-- Poetry 1.4+
-- Python 3.9+ (although probably Python 3.7+ will work)
+- Poetry 1.6+
+- Python 3.10+ (although probably Python 3.7+ will work)
 
 ```
 poetry install
@@ -21,16 +21,18 @@ poetry run pytest
 Example output:
 
 ```console
-================================================================================================= test session starts =================================================================================================
-platform darwin -- Python 3.9.11, pytest-7.1.2, pluggy-1.0.0
-rootdir: /Users/phillip/aioboto3-testing, configfile: pyproject.toml, testpaths: tests
-plugins: asyncio-0.18.3
-asyncio: mode=auto
+=========================================================================================================== test session starts ===========================================================================================================
+platform darwin -- Python 3.11.6, pytest-7.4.3, pluggy-1.3.0
+rootdir: /Users/phillip/pytest-aioboto3
+configfile: pyproject.toml
+testpaths: tests
+plugins: asyncio-0.21.1, aioboto3-0.1.0
+asyncio: mode=Mode.AUTO
 collected 1 item
 
-tests/test_s3.py .                                                                                                                                                                                              [100%]
+tests/test_s3.py .                                                                                                                                                                                                                  [100%]
 
-================================================================================================== 1 passed in 0.96s ==================================================================================================
+============================================================================================================ 1 passed in 0.94s ============================================================================================================
 ```
 
 ## Installation

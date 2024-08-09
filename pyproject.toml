@@ -26,6 +26,7 @@ testpaths = [
 ]
 filterwarnings = [
     'error', # treat all warnings as errors
+    "ignore:datetime.datetime.utcnow\\(\\) is deprecated and scheduled for removal in a future version.*:DeprecationWarning", # see https://github.com/aio-libs/aiobotocore/issues/1021#issuecomment-1938713736
 ]
 asyncio_mode = "auto"
 

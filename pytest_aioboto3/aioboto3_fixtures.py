@@ -1,6 +1,7 @@
 """
 AWS asyncio test fixtures
 """
+
 from typing import Any, AsyncIterator, Iterator, Mapping, Type, TypeVar
 from unittest import mock
 
@@ -15,31 +16,29 @@ T = TypeVar("T")
 def create_fake_session(base_class: Type[T], url_overrides: Mapping[str, str]) -> Type[T]:
     class FakeSession(base_class):  # type:ignore[valid-type, misc]
         def __init__(self, *args: Any, **kwargs: Any) -> None:
-            super(FakeSession, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
             self.__url_overrides = url_overrides
             self.__secret_key = "ABCDEFGABCDEFGABCDEF"
             self.__access_key = "YTYHRSshtrsTRHSrsTHRSTrthSRThsrTHsr"
 
         def client(self, *args: Any, **kwargs: Any) -> Any:
-
             if "endpoint_url" not in kwargs and args[0] in self.__url_overrides:
                 kwargs["endpoint_url"] = self.__url_overrides[args[0]]
 
             kwargs["aws_access_key_id"] = self.__secret_key
             kwargs["aws_secret_access_key"] = self.__access_key
 
-            return super(FakeSession, self).client(*args, **kwargs)
+            return super().client(*args, **kwargs)
 
         def resource(self, *args: Any, **kwargs: Any) -> Any:
-
             if "endpoint_url" not in kwargs and args[0] in self.__url_overrides:
                 kwargs["endpoint_url"] = self.__url_overrides[args[0]]
 
             kwargs["aws_access_key_id"] = self.__secret_key
             kwargs["aws_secret_access_key"] = self.__access_key
 
-            return super(FakeSession, self).resource(*args, **kwargs)
+            return super().resource(*args, **kwargs)
 
     return FakeSession
 

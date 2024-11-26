@@ -15,7 +15,7 @@ keywords = ["pytest", "aioboto3", "moto"]
 classifiers = [
     "Framework :: Pytest",
     "Programming Language :: Python :: 3",
-    "License :: Public Domain :: WTFPL",
+    "License :: Public Domain",
 ]
 
 [tool.poetry.urls]

@@ -2,6 +2,40 @@
 test:
 	poetry run pytest
 
+.PHONY: rufflintfix
+rufflintfix:
+	poetry run ruff check . --fix
+
+.PHONY: rufflintcheck
+rufflintcheck:
+	@echo "Checking ruff..."
+	poetry run ruff check .
+
+.PHONY: rufflintwatch
+rufflintwatch:
+	poetry run ruff check . --fix --watch
+
+.PHONY: ruffformatfix
+ruffformatfix:
+	poetry run ruff format . --preview
+
+.PHONY: ruffformatcheck
+ruffformatcheck:
+	poetry run ruff format . --check --preview
+
+.PHONY: poetrycheck
+poetrycheck:
+	poetry check --lock
+
+.PHONY: pyformatcheck
+pyformatcheck: poetrycheck rufflintcheck ruffformatcheck
+
+.PHONY: lint
+lint: pyformatcheck 
+
+.PHONY: autofmt
+autofmt: rufflintfix ruffformatfix 
+
 .PHONY: patchrelease
 patchrelease:
 	poetry version patch

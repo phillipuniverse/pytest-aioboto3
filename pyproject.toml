@@ -32,6 +32,51 @@ requests = ">=2.0"
 pytest = "^7.4.3"
 boto3-stubs = {extras = ["s3"], version = "^1.28.70"}
 pytest-asyncio = "^0.21.1"
+ruff = "^0.8.0"
+
+[tool.ruff]
+target-version = "py38"
+line-length = 100
+
+lint.select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C40",  # flake8-comprehensions
+    "C90", # mccabe
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+    "A",  # flake8-builtins
+    "T10", # flake8-debugger
+    "BLE", # flake8-blind-except
+    "T20",  # flake8-print
+    "DTZ", # flake8-datetimez
+    "PIE", # flake8-pie
+    "ERA", # eradicate
+    "PL", # pylint
+    "SIM", # flake8-simplify
+    "ERA", # eradicate,
+    "RUF", # ruff-specific
+    "TRY", # tryceratops
+    "PTH", # flake8-use-pathlib"
+    "PGH", # pygrep-hooks
+    "TID", # tidy imports
+    "ICN"
+]
+lint.ignore = [
+    "E501",  # line too long, handled by formatter
+    "B008",  # function calls in argument defaults
+    "C401",  # generator syntax for sets vs always force set comprehension
+    "PLC0414",  # allow explicit re-exports using 'as' without forcing __all__
+    "TRY003", # long messages outside except classes
+    "PLR2004", # magic values refactor to constants
+]
+
+
+    [tool.ruff.format]
+    docstring-code-format = true
+
 
 [tool.pytest.ini_options]
 testpaths = [

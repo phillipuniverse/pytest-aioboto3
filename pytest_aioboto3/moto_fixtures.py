@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import logging
 import shutil
 import signal
@@ -6,7 +7,7 @@ import socket
 import subprocess
 import time
 from subprocess import Popen
-from typing import Any, Dict, Iterator, Mapping
+from typing import Any, Iterator, Mapping
 
 import pytest
 import requests
@@ -31,20 +32,20 @@ def start_moto_server(service_name: str, host: str, port: int) -> Popen[Any]:
         )
     args = [moto_svr_path, service_name, "-H", host, "-p", str(port)]
     # For debugging
-    # args = f"moto_svr_path service_name -H host -p port 2>&1 | tee -a /tmp/moto.log"
+    # args = f"moto_svr_path service_name -H host -p port 2>&1 | tee -a /tmp/moto.log"  # noqa: ERA001
     logger.info(f"Starting moto server: {args}")
     process = subprocess.Popen(
         args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )  # shell=True
     url = f"http://{host}:{port}"
 
-    for i in range(0, 30):
+    for _ in range(30):
         output = process.poll()
         if output is not None:
             logger.error(f"moto_server exited status {output}")
             stdout, stderr = process.communicate()
-            logger.error(f"moto_server stdout: {str(stdout)}")
-            logger.error(f"moto_server stderr: {str(stderr)}")
+            logger.error(f"moto_server stdout: {stdout!s}")
+            logger.error(f"moto_server stderr: {stderr!s}")
             pytest.fail(f"Can not start service: {service_name}")
 
         try:
@@ -55,7 +56,7 @@ def start_moto_server(service_name: str, host: str, port: int) -> Popen[Any]:
             time.sleep(0.5)
     else:
         stop_process(process)  # pytest.fail doesn't call stop_process
-        pytest.fail("Can not start moto service: {}".format(service_name))
+        pytest.fail(f"Can not start moto service: {service_name}")
 
     logger.info(f"Connected to moto server at {url}")
 
@@ -66,12 +67,12 @@ def stop_process(process: Popen[Any]) -> None:
     try:
         process.send_signal(signal.SIGTERM)
         process.communicate(timeout=20)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as te:
         process.kill()
         outs, errors = process.communicate(timeout=20)
         exit_code = process.returncode
-        msg = "Child process finished {} not in clean way: {} {}".format(exit_code, outs, errors)
-        raise RuntimeError(msg)
+        msg = f"Child process finished {exit_code} not in clean way: {outs} {errors}"
+        raise RuntimeError(msg) from te
 
 
 def get_free_tcp_port() -> int:
@@ -90,7 +91,7 @@ def moto_services() -> Iterator[Mapping[str, str]]:
     Map of mocked services with moto where the key is the service name and the value is the moto url to that service
     """
     processes = []
-    services: Dict[str, str] = {}
+    services: dict[str, str] = {}
     """
 
     1. Add a new entry to the 'extras' section in pyproject.toml for types-aiobotocore, moto and boto3-stubs like 'dynamodb' or 'ec2'
@@ -109,6 +110,6 @@ def moto_services() -> Iterator[Mapping[str, str]]:
         try:
             stop_process(process)
             logger.info(f"Stopped moto process {process.pid}")
-        except Exception as e:
+        except Exception:
             # Keep going through exceptions to stop as many as possible
-            logger.exception(f"Problem stopping moto process {process}", e)
+            logger.exception(f"Problem stopping moto process {process}")

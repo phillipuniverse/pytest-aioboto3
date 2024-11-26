@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - "**"
-    branches_ignore:
-      - 'refs/pull/*'
   pull_request:
     branches:
       - '**'
@@ -13,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.event.pull_request == null  # Prevent push CI for PRs
     strategy:
       fail-fast: false
       matrix:

@@ -3,8 +3,12 @@ name: Tests
 on:
   push:
     branches:
-      - "*"
+      - "**"
+    branches_ignore:
+      - 'refs/pull/*'
   pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:

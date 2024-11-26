@@ -7,6 +7,19 @@ name = "pytest-aioboto3"
 version = "0.3.0"
 description = "Aioboto3 Pytest with Moto"
 authors = ["Shipwell Engineering", "Phillip Verheyden"]
+license = "WTFPL"
+readme = "README.md"
+homepage = "https://github.com/phillipuniverse/pytest-aioboto3"
+repository = "https://github.com/phillipuniverse/pytest-aioboto3"
+keywords = ["pytest", "aioboto3", "moto"]
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3",
+    "License :: Public Domain :: WTFPL",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/phillipuniverse/pytest-aioboto3/issues"
 
 [tool.poetry.dependencies]
 python = "^3.10"

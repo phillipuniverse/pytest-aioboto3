@@ -10,17 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: read
       id-token: write
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.10'
+
     - name: Install dependencies
       run: |
         pip install poetry
-    - name: Build and publish
+
+    - name: Build
+      run: poetry build
+
+    - name: Mint pypi publisher token
+      id: pypi-token
+      uses: tschm/token-mint-action@v1.0.3
+
+    - name: Publish
       run: |
-        poetry build
-        poetry publish
+        poetry publish -u __token__ -p '${{ steps.pypi-token.outputs.api-token }}'

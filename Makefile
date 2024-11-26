@@ -1,3 +1,7 @@
+.PHONY: test
+test:
+	poetry run pytest
+
 .PHONY: patchrelease
 patchrelease:
 	poetry version patch

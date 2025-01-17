@@ -9,6 +9,7 @@ import time
 from subprocess import Popen
 from typing import Any, Iterator, Mapping
 
+import moto
 import pytest
 import requests
 
@@ -20,7 +21,7 @@ _proxy_bypass = {
 logger = logging.getLogger(__name__)
 
 
-def start_moto_server(service_name: str, host: str, port: int) -> Popen[Any]:
+def start_moto_server(service_name: str | None, host: str, port: int) -> Popen[Any]:
     """
     This originally comes from the tests in aioboto3 that starts up a moto server to test interactions
     at https://github.com/terrycain/aioboto3/blob/92a7a9b8a32615ab6a9ea51ef360475ede94bb1f/tests/mock_server.py
@@ -30,7 +31,12 @@ def start_moto_server(service_name: str, host: str, port: int) -> Popen[Any]:
         raise ValueError(
             "Could not find a path to moto_server, is it installed in the virtualenvironment?"
         )
-    args = [moto_svr_path, service_name, "-H", host, "-p", str(port)]
+    args = [moto_svr_path]
+    if service_name:
+        args.append(service_name)
+
+    args += ["-H", host, "-p", str(port)]
+
     # For debugging
     # args = f"moto_svr_path service_name -H host -p port 2>&1 | tee -a /tmp/moto.log"  # noqa: ERA001
     logger.info(f"Starting moto server: {args}")
@@ -91,20 +97,36 @@ def moto_services() -> Iterator[Mapping[str, str]]:
     Map of mocked services with moto where the key is the service name and the value is the moto url to that service
     """
     processes = []
-    services: dict[str, str] = {}
+    service_to_url: dict[str, str] = {}
+
+    services_to_start = ("s3",)
     """
 
     1. Add a new entry to the 'extras' section in pyproject.toml for types-aiobotocore, moto and boto3-stubs like 'dynamodb' or 'ec2'
     2. Add to this tuple the service that you want to mock, the same as the extra you added
     """
-    for service in ("s3",):
+
+    def _start_moto(service_name: str | None = None) -> str:
         host = "localhost"
         port = get_free_tcp_port()
         url = f"http://{host}:{port}"
-        processes.append(start_moto_server(service, host, port))
-        services[service] = url
+        processes.append(start_moto_server(service_name, host, port))
+        return url
 
-    yield services
+    if int(moto.__version__.split(".")[0]) >= 5:
+        # Only a single instance is necessary for moto5, in moto4 you start an instance for each service
+        # more information see https://github.com/getmoto/moto/issues/7198#issue-2069113863
+
+        url = _start_moto()
+        for service in services_to_start:
+            service_to_url[service] = url
+
+    else:
+        for service in ("s3",):
+            url = _start_moto(service_name=service)
+            service_to_url[service] = url
+
+    yield service_to_url
 
     for process in processes:
         try:

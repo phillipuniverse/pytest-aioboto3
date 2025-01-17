@@ -4,7 +4,7 @@ test:
 
 .PHONY: rufflintfix
 rufflintfix:
-	poetry run ruff check . --fix
+	poetry run ruff check . --fix --unsafe-fixes
 
 .PHONY: rufflintcheck
 rufflintcheck:
